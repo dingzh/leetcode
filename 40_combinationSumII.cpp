@@ -10,9 +10,7 @@ public:
         vector<vector<int>> ret;
 
         helper(0, 0, sum, target, candidates, chosen, ret);
-        
-        sort(ret.begin(), ret.end());
-        ret.erase(unique(ret.begin(), ret.end()), ret.end());
+
         return ret;
     }
 
@@ -26,11 +24,14 @@ public:
             }
             ret.push_back(move(tmp));
         } else if(k + 1 < candidates.size()) {
-            if (l + kcand + candidates[k + 1] <= target) helper(l + kcand, k + 1, r - kcand, target, candidates, chosen, ret);
-
-            if (l + r - kcand >= target && l + candidates[k+1] <= target) {
-                chosen[k] = false;
-                helper(l, k + 1, r - kcand, target, candidates, chosen, ret);
+            if (l + kcand + candidates[k+1] <= target) helper(l + kcand, k + 1, r - kcand, target, candidates,     chosen, ret);
+            
+            chosen[k] = false;
+            int next = k + 1;
+            while (next < candidates.size() && candidates[next] == kcand) {chosen[next++] = false; r -= kcand;}
+            
+            if (l + r - kcand >= target && l + candidates[next] <= target) {
+                helper(l, next, r - kcand, target, candidates, chosen, ret);
             }
         }
     }
