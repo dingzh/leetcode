@@ -12,24 +12,20 @@ public:
     vector<int> inorderTraversal(TreeNode* root) {
         vector<int> ret;
 
-        stack<TreeNode*> st;
-        leftChain(root, st);
-        while (!st.empty()) {
-            root = st.top();
+        stack<pair<TreeNode*, bool>> st;
+        if (root) st.push({root, false});
+        while(!st.empty()) {
+            auto top = st.top();
             st.pop();
-
-            ret.push_back(root->val);
-
-            if (root->right) leftChain(root->right);
+            if (top.second) {
+                ret.push_back(top.first->val);
+            } else {
+                root = top.first;
+                if(root->right) st.push({root->right, false});
+                st.push({root, true});
+                if(root->left) st.push({root->left, false});
+            }
         }
-
         return ret;
-    }
-
-    void leftChain(TreeNode* root, stack<TreeNode*>& st) {
-        while (root) {
-            st.push(root);
-            root = root->left;
-        }
     }
 };
