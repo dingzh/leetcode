@@ -17,9 +17,11 @@ public:
         while (!st.empty()) {
             root = st.top();
             st.pop();
-            ret.push_back(root->val);
-            if (root->right) st.push(root->right);
-            if (root->left) st.push(root->left);
+            do {
+                ret.push_back(root->val);
+                if (root->right) st.push(root->right);
+                root = root->left;
+            } while (root);
         }
         return ret;
     }
