@@ -1,6 +1,9 @@
 class Solution {
 public:
     int numSquares(int n) {
+        if (n % 8 == 7) return 4;
+        while (n && 3 == 0) n >>= 2;
+        
         vector<int> pac(n+1, 0);
         for (int j = 0; j <=n; ++j) pac[j] = -j;
 
