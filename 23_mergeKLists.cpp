@@ -6,36 +6,33 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
-
-class heapNode {
+class NodeCompare {
 public:
-    int val;
-    ListNode *curr;
-    ListNode *next;
-    heapNode(ListNode *ln) {val = ln->val; curr = ln; next = ln->next;}
-    bool operator<(const heapNode &hn) const{
-        return val > hn.val;
+    bool operator() (ListNode* lhs, ListNode* rhs) {
+        return lhs->val > rhs->val;
     }
 };
+
 class Solution {
 public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
         ListNode head(0);
-        ListNode *curr = &head;
+        ListNode* curr = &head;
+        
+        lists.erase(remove(lists.begin(), lists.end(), nullptr), lists.end());
+        
+        priority_queue<ListNode*, vector<ListNode*>, NodeCompare> 
+            pq(lists.begin(), lists.end());
 
-        priority_queue<heapNode> q;
-        for (auto list : lists) {
-           if(list) q.emplace(list);
+        while (!pq.empty()) {
+            auto top = pq.top();
+            pq.pop();
+
+            curr->next = top;
+            curr = top;
+            top = top->next;
+            if (top) pq.push(top);
         }
-
-        while (!q.empty()) {
-            const auto top = q.top();
-            q.pop();
-            curr->next = top.curr;
-            curr = top.curr;
-            if(top.next) q.emplace(top.next);
-        }
-
         return head.next;
     }
 };
