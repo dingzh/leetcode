@@ -1,32 +1,24 @@
 class Solution {
 public:
     bool isValid(string s) {
-        int len = s.length();
-    
-        stack<char> st;
-        for (int i = 0; i < len; ++i) {
-            char c = s[i];
-            if (c == '(' || c == '[' || c == '{') {
-                st.push(c);
+        map<char, char> mapping;
+        mapping.insert({')', '('});
+        mapping.insert({']', '['});
+        mapping.insert({'}', '{'});
+        
+        stack<char> stk;
+        for (auto ch : s) {
+            auto it = mapping.find(ch);
+            if (it == mapping.end()) {
+                stk.push(ch);
                 continue;
             }
+            
+            if (stk.empty() || it->second != stk.top()) return false;
 
-            if (st.empty()) return false;
-
-            switch(st.top()) {
-                case '{':
-                    if (c != '}') return false;
-                    break;
-                case '[':
-                    if (c != ']') return false;
-                    break;
-                case '(':
-                    if (c != ')') return false;
-                    break;
-            }
-            st.pop();
+            stk.pop();
         }
 
-        return st.empty();
+        return stk.empty();
     }
 };
