@@ -5,20 +5,19 @@ public:
         if ( !size ) return {};
 
         vector<int> ret(size, 0);
-        stack<pair<int,int>> stk;
+        stack<int> stk;
 
         for (int i = 0; i < temperatures.size(); ++i) {
             while (!stk.empty()) {
-                auto &top = stk.top();
-                if (top.first < temperatures[i]) {
-                    int idx = top.second;
+                int idx = stk.top();
+                if (temperatures[idx] < temperatures[i]) {
                     ret[idx] = i - idx;
                     stk.pop();
                 } else {
                     break;
                 }
             }
-            stk.push(make_pair(temperatures[i], i));
+            stk.push(i);
         }
 
         return ret;
