@@ -7,25 +7,37 @@
  * };
  */
 class Solution {
+    TreeLinkNode* dummy;
+    TreeLinkNode* tail;
 public:
     void connect(TreeLinkNode *root) {
-        int currLevel = 1;
-        int nextLevel = 0;
-        TreeLinkNode *qHead = root, *qTail = root;
-        while (qHead != nullptr) {
-            if (qHead->left) {++nextLevel; qTail = qTail->next = qHead->left;}
-            if (qHead->right) {++nextLevel; qTail = qTail->next = qHead->right;}
-            --currLevel;
-            if (!currLevel) {
-                currLevel = nextLevel; 
-                nextLevel = 0;
-                TreeLinkNode* tmp = qHead;
-                qHead = qHead->next;
-                tmp->next = nullptr;
-            } else {
-                qHead = qHead->next;
+        if (!root) return;
+        dummy = new TreeLinkNode(0);
+        tail = dummy;
+
+        push(root);
+        TreeLinkNode* rightmost = root;
+        while (tail != dummy) {
+            TreeLinkNode* front = pop();
+            if (front->left) push(front->left);
+            if (front->right) push(front->right);
+
+            if (front == rightmost) {
+                front->next = nullptr;
+                rightmost = tail;
             }
         }
     }
 
+    TreeLinkNode* pop() {
+        TreeLinkNode* ret = dummy->next;
+        dummy->next = ret->next;
+        if (ret == tail) tail = dummy;
+        return ret;
+    }
+
+    void push(TreeLinkNode* node) {
+        tail->next = node;
+        tail = node;
+    }
 };
