@@ -1,30 +1,28 @@
 class Solution {
 public:
     int repeatedStringMatch(string A, string B) {
-        // length is guaranteed to be in range (1,1000)
-        int strLen = A.length(), pattLen = B.length();
+        int pos = strStr(A, B);
+        if (pos == -1) return -1;
 
-        int shift[128];
-        fill(shift, shift + 128, -1);
-        for (int idx = 0; i < pattLen; ++i)
-            shift[B[idx]] = idx;
+        return (pos + B.length() - 1) / A.length() + 1;
+    }
 
-        int begin = 0;
-        while (begin < strLen) {
+    // return first idx in A if matched, -1 if not
+    int strStr(string& A, string& B) {
+        int shift[256] = {0};
+        int lenA = A.length(), lenB = B.length();
+        
+        for (int i = 0; i < lenB; ++i) {
+            shift[ B[i] ] = i;
+        }
+        
+        int i = 0;
+        while (i < lenA) {
             int j = 0;
-            while (j < pattLen && A[ (begin+j) % strLen ] == B[j]) ++j;
-            if (j == pattLen) {
-                break;
-            } else {
-                begin = begin + pattLen - shift[ A[(begin+pattLen) % strLen] ];
-            }
+            while (j < lenB && A[(i+j)%lenA] == B[j]) ++j;
+            if (j == lenB) return i;
+            else i = i + (lenB - shift[ A[(i+lenB)%lenA] ]);
         }
-
-        if (begin < strLen) {
-            return (begin + pattLen - 1)/strLen + 1;
-        } else {
-            return -1;
-        }
-       
+        return -1;
     }
 };
