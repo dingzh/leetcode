@@ -1,3 +1,9 @@
+static auto x = [](){
+    std::ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    return 0;
+}();
+
 class LRUCache {
     struct cacheNode {
         int key;
@@ -31,8 +37,11 @@ public:
         assert(capacity > 0);
         currsize = 0;
         maxsize = capacity;
-public:
-    LRUCache(int capacity):maxsize(capacity), currsize(0) {
+        dummyHead.next = &dummyTail;
+        dummyTail.prev = &dummyHead;
+    }
+
+    int get(int key) {
         auto it = keyToNode.find(key);
         if (it == keyToNode.end()) {
             return -1;
