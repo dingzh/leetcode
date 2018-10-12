@@ -31,11 +31,8 @@ public:
         assert(capacity > 0);
         currsize = 0;
         maxsize = capacity;
-        dummyHead.next = &dummyTail;
-        dummyTail.prev = &dummyHead;
-    }
-
-    int get(int key) {
+public:
+    LRUCache(int capacity):maxsize(capacity), currsize(0) {
         auto it = keyToNode.find(key);
         if (it == keyToNode.end()) {
             return -1;
