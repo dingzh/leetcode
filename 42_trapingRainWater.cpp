@@ -2,22 +2,22 @@ class Solution {
 public:
     int trap(vector<int>& height) {
         int size = height.size();
-        if (size < 3) return 0;
+        vector<int> lheight(size, 0);
         
-        stack<int> st;
-        int ret = 0;
-        for (int i = 0; i < size - 1; ++i) {
-            int tran = height[i + 1] - height[i];
-            if (tran < 0) {
-                while (tran++) st.push(i);
-            } else if (tran > 0) {
-                while (tran-- && !st.empty()) {
-                    ret += i - st.top();
-                    st.pop();
-                }
-            }
+        int max_height = 0;
+        for (int i = 0; i < size; ++i) {
+            lheight[i] = max_height;
+            max_height = max(max_height, height[i]);
         }
 
+        max_height = 0;
+        int ret = 0;
+        for (int i = size-1; i > -1; --i) {
+            int water = min(lheight[i], max_height) - height[i];
+            max_height = max(max_height, height[i]);
+            ret += max(0, water);
+        }
+       
         return ret;
     }
 };
