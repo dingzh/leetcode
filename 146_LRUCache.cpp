@@ -1,3 +1,9 @@
+static auto x = [](){
+    std::ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    return 0;
+}();
+
 class LRUCache {
     struct cacheNode {
         int key;
