@@ -1,32 +1,40 @@
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
-        int size = nums.size();
-        if (size < 2) return size;
-
-        vector<int> minSeqEnd;
-        //constexpr int minInt = 1 << 31;
-        //minSeqEnd.push_back(minInt);
-
-        for (int i = 0; i < size; ++i) {
-            int idx = leftGreaterEqual(minSeqEnd, nums[i]);
-            if (idx == minSeqEnd.size()) minSeqEnd.emplace_back(nums[i]);
-            else minSeqEnd[idx] = nums[i];
+        int* least_ending = new int[nums.size()];
+        
+        least_ending[0] = 1<<31;
+        int size = 1;
+        
+        for (auto num : nums) {
+            int pos = findPos(num, least_ending, size);
+            if (num > least_ending[pos-1]) {
+                least_ending[pos] = num;
+                if (pos == size)
+                    ++size;
+            }
         }
 
-        return minSeqEnd.size();
+        delete [] least_ending;
+        return size-1;       
     }
-
-    // return the index where the first element is not smaller that target
-    // if such element doen not exist, return 1 past end;
-    int leftGreaterEqual(const vector<int>& seq, int target) {
-        int lt = 0, rt = seq.size();
-
+    
+    int findPos(int target, int* nums, int size) {
+        int lt = 0, rt = size;
         while (lt < rt) {
-            int mid = (lt + rt) >> 1;
-            if (seq[mid] >= target) rt = mid;
-            else lt = mid + 1;
+            int mid = lt + (rt-lt)/2;
+            if (nums[mid] <= target) {
+                lt = mid + 1;
+            } else {
+                rt = mid;
+            }
         }
-        return rt;
+        return lt;
     }
 };
+
+
+
+
+
+
