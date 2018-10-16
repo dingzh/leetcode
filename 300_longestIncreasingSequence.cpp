@@ -1,40 +1,19 @@
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
-        int* least_ending = new int[nums.size()];
+        vector<int> least_ending( nums.size(), 0 );
         
-        least_ending[0] = 1<<31;
+        least_ending[0] = numeric_limits<int>::min();
         int size = 1;
         
         for (auto num : nums) {
-            int pos = findPos(num, least_ending, size);
-            if (num > least_ending[pos-1]) {
-                least_ending[pos] = num;
-                if (pos == size)
-                    ++size;
+            auto end = least_ending.begin() + size;
+            auto it = upper_bound( least_ending.begin(), end, num );
+            if (num > *(it-1)) {
+                if ( it == end ) { ++size; }
+                *it = num;
             }
         }
-
-        delete [] least_ending;
         return size-1;       
     }
-    
-    int findPos(int target, int* nums, int size) {
-        int lt = 0, rt = size;
-        while (lt < rt) {
-            int mid = lt + (rt-lt)/2;
-            if (nums[mid] <= target) {
-                lt = mid + 1;
-            } else {
-                rt = mid;
-            }
-        }
-        return lt;
-    }
 };
-
-
-
-
-
-
