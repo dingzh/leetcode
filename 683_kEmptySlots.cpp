@@ -1,45 +1,24 @@
 class Solution {
 public:
     int kEmptySlots(vector<int>& flowers, int k) {
-        int size = flowers.size();
-        if (size - 2 < k) return -1;
-
-        vector<int> indexed_tree(size+1, 0);
-        vector<int> status(size+1, 0);
-
-        for (int i = 0; i < size; ++i) {
-            int pos = flowers[i];
-            status[pos] = 1;
-            update(pos, 1, indexed_tree);
-            
-            int prev_pos = pos - k - 1, next_pos = pos + k + 1;
-            int bloom_till_pos = getsum(pos, indexed_tree);
-            if (prev_pos > 0 && status[prev_pos]
-                    && bloom_till_pos == 1 + getsum(prev_pos, indexed_tree)) {
-                return i+1;
-            }
-            if (next_pos <= size && status[next_pos]
-                    && bloom_till_pos + 1 == getsum(next_pos, indexed_tree)){
-                return i+1;
-            }
+        int N = flowers.size();
+        vector<int> days(N, 0);
+        // on which day flower on position i bloom
+        for (int i = 0; i < N; ++i) {
+            days[ flowers[i] - 1 ] = i + 1;
         }
-        return -1;
-    }
 
-    void update(int pos, int delta, vector<int>& indexed_tree) {
-        int size = indexed_tree.size();
-        while (pos < size) {
-            indexed_tree[pos] += delta;
-            pos += pos & -pos;
+        int first_day = numeric_limits<int>::max();
+        int left = 0, right = k + 1;
+        while (right < N) {
+            int bloom_after = max(days[left], days[right]);
+            int idx = left + 1;
+            for (; idx < right && days[idx] > bloom_after; ++idx) { }
+            if (idx == right) first_day = min(first_day, bloom_after);
+            left = idx;
+            right = left + k + 1;
         }
-    }
 
-    int getsum(int pos, vector<int>& indexed_tree) {
-        int ret = 0;
-        while (pos > 0) {
-            ret += indexed_tree[pos];
-            pos -= pos & -pos;
-        }
-        return ret;
+        return first_day == numeric_limits<int>::max() ? -1 : first_day;
     }
 };
