@@ -1,31 +1,28 @@
 class Solution {
 public:
     int totalFruit(vector<int>& tree) {
-        int size = tree.size();
-        map<int, int> fruit_last_seen;
-
-        int ret = 0;
-        int count = 0;
-        for (int i = 0; i < size; ++i) {
-            if (fruit_last_seen.size() < 2 || fruit_last_seen.count(tree[i])) {
+        int N = tree.size();
+        map<int, int> last_seen;
+        
+        int max_count = 0, count = 0, start = 0;
+        for (int i = 0; i < N; ++i) {
+            int fruit = tree[i];
+            if (last_seen.size() < 2 || last_seen.count(fruit)) {
                 ++count;
+                last_seen[fruit] = i;
             } else {
-                auto first = fruit_last_seen.cbegin();
-                auto second = next(first);
-                int start = 0;
-                if (first->second < second->second) {
-                    start = first->second;
-                    fruit_last_seen.erase(first);
-                } else {
-                    start = second->second;
-                    fruit_last_seen.erase(second);
+                for (auto& fruit_idx : last_seen) {
+                    if (fruit_idx.second != i-1) {
+                        start = fruit_idx.second + 1;
+                        last_seen.erase(fruit_idx.first);
+                    }
                 }
-                ret = max(ret, count);
-                count = i - start;
+                count = i - start + 1;
+                last_seen[fruit] = i;
             }
-            fruit_last_seen[tree[i]] = i;
+
+            max_count = max(max_count, count);
         }
-        ret = max(ret, count);
-        return ret;
+        return max_count;
     }
 };
