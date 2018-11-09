@@ -1,31 +1,35 @@
 class TopVotedCandidate {
-    unordered_map<int, vector<int>> votes;
+    vector<pair<int,int>> winner_at_time; // pair (time, person)
 public:
     TopVotedCandidate(vector<int> persons, vector<int> times) {
-        for ( int i = 0; i < persons.size(); ++i ) {
-            votes[ persons[i] ].push_back( times[i] );
-            // each vector will be strictly increasing too
-        }
-    }
-    
-    int q(int t) {
-        int max_vote_time = numeric_limits<int>::max();
-        int person, max_vote_cnt = 0;
-
-        for (auto& person_votes : votes) {
-            vector<int>& vote_rec = person_votes.second;
-            auto past_last_vote = upper_bound( begin(vote_rec), end(vote_rec), t );
-            int vote_cnt = distance(vote_rec.begin(), past_last_vote);
-            if (vote_cnt == 0) continue; // check before we access last vote
-            int vote_time = *prev(past_last_vote);
-            if (vote_cnt > max_vote_cnt ||
-                    vote_cnt == max_vote_cnt && vote_time > max_vote_time) {
-                max_vote_time = vote_time;
-                max_vote_cnt = vote_cnt;
-                person = person_votes.first;
+        if (persons.size() == 0) return ;
+        unordered_map<int, int> vote_count;
+        
+        // count first one
+        winner_at_time.emplace_back( times[0], persons[0] );
+        vote_count[ persons[0] ] = 1;
+        int max_vote = 1;
+        // count the rest
+        for ( int i = 1; i < persons.size(); ++i ) {
+            int person = persons[i];
+            int this_vote_count = ++vote_count[person];
+            if (this_vote_count >= max_vote) {
+                if (winner_at_time.back().second != person)
+                    winner_at_time.emplace_back(times[i], person);
+                max_vote = this_vote_count;
             }
         }
-        return person;
+    }
+
+    int q(int t) {
+        auto past_winner = upper_bound(
+                begin(winner_at_time), end(winner_at_time),
+                make_pair(t, 0), 
+                [](auto& lhs, auto& rhs) -> bool{
+                    return lhs.first < rhs.first;
+                });
+        int ret = prev(past_winner)->second;
+        return ret;
     }
 };
 
