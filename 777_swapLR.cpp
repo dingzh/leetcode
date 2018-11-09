@@ -1,44 +1,26 @@
 class Solution {
 public:
     bool canTransform(string start, string end) {
-        int start_len = start.length();
-        if (start_len != end.length()) return false;
-        
-        int lt = 0, rt = start_len - 1;
-        
-        while (lt <= rt) {
-            while (lt <= rt && start[lt] == end[lt]) ++lt;
-            if (lt > rt) return true;
-            if (start[lt] == 'R' && end[lt] == 'X') {
-                for (int i = lt + 1; i <= rt; ++i) {
-                    if (start[i] == 'X') {
-                        start[i] = 'R';
-                        start[lt] = 'X';
-                        break;
-                    } else if (start[i] == 'L') {
-                        return false;
-                    }
-                }
-                
-                if (start[lt] != 'X') return false;
-            } else if (start[lt] == 'X' && end[lt] == 'L') {
-                for (int i = lt + 1; i <= rt; ++i) {
-                    if (start[i] == 'L') {
-                        start[i] = 'X';
-                        start[lt] = 'L';
-                        break;
-                    } else if (start[i] == 'R') {
-                        return false;
-                    }
-                }
-                
-                if (start[lt] != 'L') return false;
+        int len = start.length();
+        if (len != end.length()) return false;
+
+        int wait_for_L = 0, wait_for_R = 0;
+        for (int i = 0; i < len; ++i) {
+            if (wait_for_L) {
+                if (start[i] == 'R' || end[i] == 'R') return false;
+                if (start[i] == 'L') --wait_for_L;
+                if (end[i] == 'L') ++wait_for_L;
+            } else if (wait_for_R) {
+                if (start[i] == 'L' || end[i] == 'L') return false;
+                if (start[i] =='R') ++wait_for_R;
+                if (end[i] == 'R') --wait_for_R;
             } else {
-                return false;
+                if (start[i] == end[i]) continue;
+                if (start[i] == 'L' || end[i] == 'R') return false;
+                if (start[i] == 'R') ++wait_for_R;
+                if (  end[i] == 'L') ++wait_for_L;
             }
-            ++lt;
         }
-        
-        return true;
+        return !wait_for_L && !wait_for_R;
     }
 };
