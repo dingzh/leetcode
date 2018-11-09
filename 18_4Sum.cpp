@@ -12,6 +12,13 @@ public:
              vector<vector<int>>& ret, vector<int>& res) {
         int size = nums.size();
         if (begin + k > size) return;
+        
+        // pruning
+        int min_sum = 0, max_sum = 0;
+        for (int i = 0; i < k; ++i) min_sum += nums[begin+i];
+        if (min_sum > target) return;
+        for (int i = k; i > 0; --i) max_sum += nums[size-i];
+        if (max_sum < target) return;
 
         
         if (k == 2) {
