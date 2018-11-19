@@ -1,39 +1,47 @@
 class NumArray {
-    int size;
-    vector<int> _nums;
-    vector<int> idx_arr;
+    int n;
+    vector<int> tree;
 public:
-    NumArray(vector<int> nums): idx_arr(nums.size()+1, 0) {
-        _nums = move(nums);
-        size = _nums.size();
-        for ( int i = 0; i < _nums.size(); ++i ) {
-            updateAux(i+1, _nums[i]);
+    NumArray(vector<int> nums) {
+        n = nums.size();
+        tree = vector<int>(2 * n + 1, 0); // + 1 in case nums is empty()
+        for (int i = 0; i < n; ++i) {
+            tree[i + n] = nums[i];
         }
+
+        for (int i = n-1; i > 0; --i) {
+            tree[i] = tree[2 * i] + tree[2 * i + 1];
+        }
+        // for (int i = 0; i < 2 * n; ++i) cout << tree[i] << endl; 
     }
-    
+
     void update(int i, int val) {
-        int delta = val - _nums[i];
-        _nums[i] = val;
-        updateAux( i+1, delta );
-    }
-    
-    int sumAux(int idx) {
-        int ret = 0;
-        while (idx > 0) {
-            ret += idx_arr[idx];
-            idx -= (-idx) & idx;
+        int idx = i + n;
+        int delta = val - tree[idx];
+        while (idx) {
+            tree[idx] += delta;
+            idx >>= 1;
         }
     }
 
-    void updateAux(int idx, int delta) {
-        while (idx <= size) {
-            idx_arr[idx] += delta;
-            idx += (-idx) & idx;
-        }
-    }
-    
     int sumRange(int i, int j) {
-        return sumAux(j + 1) - sumAux(i);
+        int ret = 0;
+        i += n;
+        j += n;
+
+        while (i <= j) {
+            if (i & 1) { // i is right child
+                ret += tree[i];
+                ++i;
+            }
+            if ((j & 1) == 0) { // j is left child
+                ret += tree[j];
+                --j;
+            }
+            i >>= 1;
+            j >>= 1;
+        }
+        return ret;
     }
 };
 
