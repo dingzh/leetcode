@@ -9,24 +9,23 @@ public:
         }
     }
     
-    int shortest(string word1, string word2) {
+    int shortest(const string& word1, const string& word2) {
         vector<int>& indexes1 = word_indexes[word1];
         vector<int>& indexes2 = word_indexes[word2];
         
         int ret = size;
-        for (int idx : indexes1) {
-            ret = min(ret, distance(idx, indexes2));
-            if (ret == 1) return ret;
-        }
+        int i = 0, j = 0, size1 = indexes1.size(), size2 = indexes2.size();
         
-        return ret;
-    }
-    
-    int distance(int idx, vector<int>& indexes) {
-        int ret = size;
-        auto it = upper_bound(begin(indexes), end(indexes), idx);
-        if (it != indexes.end()) ret = min(ret, *it - idx);
-        if (it != indexes.begin()) ret = min(ret, idx - *prev(it));
+        while (i < size1 && j < size2) {
+            int idx1 = indexes1[i], idx2 = indexes2[j];
+            if (idx1 < idx2) {
+                ret = min(ret, idx2 - idx1);
+                ++i;
+            } else { // idx1 > idx 2
+                ret = min(ret, idx1 - idx2);
+                ++j;
+            }
+        }
         return ret;
     }
 };
