@@ -1,27 +1,21 @@
 class Solution {
-    struct Pos {
-        int height;
-        int start;
-        int index;
-        Pos(int height, int start, int index):
-            height(height), start(start), index(index) {}
-    };
 public:
     int largestRectangleArea(vector<int>& heights) {
         heights.push_back(0);
-        int N = heights.size();
-        int maxRect = 0;
-        stack<Pos> stk;
-
-        for (int i = 0; i < N; ++i) {
-            while (!stk.empty() && stk.top().height > heights[i]) {
-                maxRect = max(maxRect, (i - stk.top().start) * stk.top().height);
+        int ret = 0, size = heights.size();
+        stack<pair<int,int>> stk; //(height, idx)
+        stk.emplace(0, -1); 
+        
+        for (int i = 0; i < size; ++i) {
+            int height = heights[i];
+            while (stk.top().first > height) {
+                auto top = stk.top();
                 stk.pop();
+                ret = max(ret, top.first * (i - stk.top().second - 1));
             }
-            int start_idx = stk.empty() ? 0 : stk.top().index + 1;
-            stk.push({heights[i], start_idx, i});
+            
+            stk.emplace(height, i);
         }
-
-        return maxRect;
+        return ret;
     }
 };
