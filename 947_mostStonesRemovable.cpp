@@ -1,42 +1,36 @@
 class Solution {
-    class DisjointSet {
-        vector<int> arr;
-    public:
-        DisjointSet(int size) {
-            arr.reserve(size);
-            for (int i = 0; i < size; ++i)
-                arr.push_back(i);
-        };
-
-        int find(int idx) {
-            if (idx != arr[idx]) {
-                return arr[idx] = find(arr[idx]);
-            } else {
-                return idx;
-            }
-        }
-
-        void join(int idx1, int idx2) {
-            int set1 = find(idx1);
-            int set2 = find(idx2);
-            if (set1 != set2)
-                arr[set2] = set1;
-        }
-    };
 public:
     int removeStones(vector<vector<int>>& stones) {
-        constexpr int N = 10'005;
-        DisjointSet ds( 2 * N );
-
-        for (auto& stone : stones) {
-            ds.join(stone[0], stone[1] + N);
+        unordered_map<int, vector<int>> graph;
+        
+        int size = stones.size();
+        for (int i = 0; i < size; ++i)
+            for (int j = i + 1; j < size; ++j) {
+                if (stones[i][0] == stones[j][0] || stones[i][1] == stones[j][1]) {
+                    // connected if same row or same col
+                    graph[i].push_back(j);
+                    graph[j].push_back(i);
+                }
+            }
+        
+        int ret = 0;
+        vector<bool> visited(size, false);
+        for (int i = 0; i < size; ++i) if (!visited[i]) {
+            visited[i] = true;
+            stack<int> stk;
+            stk.push(i);
+            
+            --ret; // each component has one
+            while (!stk.empty()) {
+                ++ret;
+                int node = stk.top();
+                stk.pop();
+                for (int next : graph[node]) if (!visited[next]) {
+                    visited[next] = true;
+                    stk.push(next);
+                }
+            }
         }
-
-        unordered_set<int> seen;
-        for (auto& stone : stones) {
-            seen.insert(ds.find(stone[0]));
-        }
-
-        return stones.size() - seen.size();
+        return ret;
     }
 };
