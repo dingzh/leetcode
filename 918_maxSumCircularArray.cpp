@@ -2,28 +2,25 @@ class Solution {
 public:
     int maxSubarraySumCircular(vector<int>& A) {
         int size = A.size();
-        assert(size);
+        if (!size) return 0;
         
-        int sum = accumulate(cbegin(A), cend(A), 0);
-
-        const int& (*pmin)(const int&, const int&) = min;
-        const int& (*pmax)(const int&, const int&) = max;
-        
-        int max_val = findOptimumComp(A, pmax);
-        int min_val = findOptimumComp(A, pmin);
-        
-        return min_val == sum ? max_val : max(max_val, sum - min_val);
-    }
-    
-    int findOptimumComp(vector<int>& A, function<const int&(const int&, const int&)> comp) {
-        // A is not empty
-        int optimum = A[0];
-        int prefix = 0;
-        for (int i = 0; i < A.size(); ++i) {
-            prefix = A[i] + comp(prefix, 0);
-            optimum = comp(prefix, optimum);
+        int suffix = 0, max_suffix = 0;
+        vector<int> aux(size, 0);
+        for (int i = size - 1; i >= 0; --i) {
+            suffix += A[i];
+            max_suffix = max(max_suffix, suffix);
+            aux[i] = max_suffix;
         }
         
-        return optimum;
+        int max_val = A[0]; // make sure non-empty
+        int dp = 0, prefix = 0;
+        for (int i = 0; i < size; ++i) {
+            dp = A[i] + max(dp, 0);
+            prefix += A[i];
+            max_val = max(dp, max_val);
+            if (i + 1 < size)
+                max_val = max(prefix + aux[i + 1], max_val);
+        }
+        return max_val;
     }
 };
