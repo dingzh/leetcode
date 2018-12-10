@@ -1,19 +1,13 @@
 class Solution {
 public:
     int rob(vector<int>& nums) {
-        int n = nums.size();
-        if (!n) return 0;
-        
-        int *val = new int[n + 1];
-        val[0] = 0;
-        val[1] = nums[0];
-        
-        for (int i = 2; i <= n; ++i) {
-            int pick = val[i-2] + nums[i-1];
-            int nopick = val[i-1];
-            val[i] = max(pick, nopick);
+        int tminus1 = 0;
+        int tminus2 = 0;
+        for (int num : nums) {
+            int curr = max(tminus1, tminus2 + num);
+            tminus2 = tminus1;
+            tminus1 = curr;
         }
-        
-        return val[n];
+        return tminus1;
     }
 };
