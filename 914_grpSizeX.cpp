@@ -5,7 +5,7 @@ public:
         for (auto k : deck) ++card_cnt[k];
         
         int gcd_curr = card_cnt.begin()->second;
-        for (auto& p : card_cnt) {
+        for (const auto& p : card_cnt) {
             gcd_curr = __gcd(gcd_curr, p.second);
         }
         
