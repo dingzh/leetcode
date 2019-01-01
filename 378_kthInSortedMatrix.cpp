@@ -1,32 +1,29 @@
 class Solution {
-    struct Element {
-        int row;
-        int col;
-        int val;
-        Element(int r, int c, int v):row(r), col(c), val(v) {}
-        bool operator< (const Element& rhs) const {
-            return val > rhs.val;
-        }
-    };
 public:
     int kthSmallest(vector<vector<int>>& matrix, int k) {
-        int row = matrix.size();
-        int col = row ? matrix.size() : 0;
-        assert(col);
-        
-        priority_queue<Element> pq;
-        for (int r = 0; r < row; ++r) {
-            pq.emplace(r, 0, matrix[r][0]);
-        }
+        int N = matrix.size();
 
-        while (--k) {
-            auto elem = pq.top();
-            pq.pop();
-            int r = elem.row, c = elem.col;
-            if(c + 1 < col) 
-                pq.emplace(r, c + 1, matrix[r][c+1]);
-        }
+        int lt = matrix[0][0], rt = matrix[N-1][N-1];
 
-        return pq.top().val;
+        while (lt < rt) {
+            int mid = lt + (rt - lt) / 2;
+            int count = countLessEqual(matrix, mid);
+            if (count < k) {
+                lt = mid + 1;
+            } else {
+                rt = mid;
+            }
+        }
+        return lt;
+    }
+
+    int countLessEqual(const vector<vector<int>>& matrix, int val) {
+        int ret = 0;
+        for (const auto& row : matrix) {
+            int cnt = distance(begin(row), upper_bound(begin(row), end(row), val));
+            if (!cnt) return ret;
+            ret += cnt;
+        }
+        return ret;
     }
 };
