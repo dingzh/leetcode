@@ -1,29 +1,36 @@
 class Solution {
 public:
     int splitArray(vector<int>& nums, int m) {
-        int n = nums.size();
-        vector<vector<int>> dp(m, vector<int>(n, numeric_limits<int>::max()));
-        vector<int> prefix_sum;
-
-        int sum = 0;
-        for (int i = 0; i < n; ++i) {
-            sum += nums[i];
-            prefix_sum.push_back(sum);
-            dp[0][i] = sum;
-        }
-
-        for (int i = 1; i < m; ++i) {
-            for (int j = i; j < n; ++j ) {
-                int& val = dp[i][j];
-                for ( int k = j - 1; k >= i-1; --k) {
-                    int lt = dp[i-1][k];
-                    int rt = prefix_sum[j] - prefix_sum[k];
-                    if (rt >= val) break;
-                    val = max(lt, rt);
-                }
+        long sum = 0;
+        sum = accumulate(begin(nums), end(nums), sum);
+        
+        long lt = sum / m, rt = sum;
+        while (lt < rt) {
+            int mid = lt + (rt - lt) / 2;
+            if (canSplit(nums, mid, m)) {
+                rt = mid;
+            } else {
+                lt = mid + 1;
             }
         }
-
-        return dp.back().back();
+        return lt;
+    }
+    
+    bool canSplit(const vector<int>& nums, const int target, const int m) {
+        int cnt = 0;
+        long sum = 0;
+        for (auto num : nums) {
+            if (num > target || cnt > m) return false;
+            
+            sum += num;
+            if (sum > target) {
+                sum = num;
+                ++cnt;
+            }
+        }
+        
+        if (sum) ++cnt;
+        return cnt <= m;
     }
 };
+
