@@ -1,86 +1,38 @@
-static auto x = [](){
-    std::ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    return 0;
-}();
-
 class LRUCache {
-    struct cacheNode {
-        int key;
-        int val;
-        cacheNode* prev;
-        cacheNode* next;
-        cacheNode(int _key = 0, int _val = 0):
-            key(_key), val(_val), prev(nullptr), next(nullptr) {}
-    };
-
-    void markUse(cacheNode* node) {
-        node->prev->next = node->next;
-        node->next->prev = node->prev;
-
-        cacheNode* head = &dummyHead;
-        node->next = head->next;
-        node->prev = head;
-        head->next = node;
-        node->next->prev = node;
-    }
-
-    int maxsize;
-    int currsize;
-    cacheNode dummyHead;
-    cacheNode dummyTail;
-    unordered_map<int, cacheNode*> keyToNode;
-
+    const int capacity;
+    list<pair<int, int>> lru;
+    using Objp = decltype(lru)::iterator;
+    unordered_map<int, Objp> key_pos;
 public:
-    // capacity must be larger than 0
-    LRUCache(int capacity) {
-        assert(capacity > 0);
-        currsize = 0;
-        maxsize = capacity;
-        dummyHead.next = &dummyTail;
-        dummyTail.prev = &dummyHead;
+    LRUCache(int capacity):capacity(capacity) {
+        // assert(capacity);
     }
 
     int get(int key) {
-        auto it = keyToNode.find(key);
-        if (it == keyToNode.end()) {
-            return -1;
-        } else {
-            cacheNode* node = it->second;
-            markUse(node);
-            return node->val;
-        }
+        auto it = key_pos.find(key);
+        if (it == end(key_pos))
+            return - 1;
+
+        auto list_it = it->second;
+        lru.splice(begin(lru), lru, list_it);
+        return lru.front().second;
     }
 
     void put(int key, int value) {
-        cacheNode* node;
-
-        auto it = keyToNode.find(key);
-        if (it != keyToNode.end()) {
-            node = it->second;
-            node->val = value;
-            markUse(node);
-            return ;
-        }
-
-        if (currsize < maxsize) {
-            node = new cacheNode(key, value);
-            ++currsize;
-
-            node->prev = &dummyHead;
-            node->next = dummyHead.next;
-            dummyHead.next = node;
-            node->next->prev = node;
-
-            keyToNode.insert({key, node});
+        auto it = key_pos.find(key);
+        if (it != end(key_pos)) {
+            auto list_it = it->second;
+            list_it->second = value;
+            lru.splice(begin(lru), lru, list_it);
         } else {
-            node = dummyTail.prev;
-            keyToNode.erase(node->key);
+            if (key_pos.size() == capacity) {
+                auto list_it = prev(end(lru));
+                key_pos.erase(key_pos.find(list_it->first));
+                lru.erase(list_it);
+            }
 
-            node->key = key;
-            node->val = value;
-            markUse(node);
-            keyToNode.insert({key, node});
+            lru.emplace_front(key, value);
+            key_pos[key] = lru.begin();
         }
     }
 };
