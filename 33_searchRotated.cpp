@@ -1,40 +1,45 @@
 class Solution {
 public:
     int search(vector<int>& nums, int target) {
-        int lt = 0, rt = nums.size();
-        if (!rt) return -1;
+        if (nums.size() == 0) return -1;
         
-        int begin = nums[0];
-        while (lt != rt) {
-            int mid = (lt + rt) >> 1, midval = nums[mid];
-            if (target < begin) {
-                if (midval < target) lt = mid + 1;
-                else if (target < midval) {
-                    if (begin <= midval) {
-                        lt = mid + 1;
-                    } else {
-                        rt = mid;
-                    }
-                } else {
-                    lt = mid;
-                    break;
-                }
-            } else {
-                if (target < midval) rt = mid;
-                else if (midval < target) {
-                    if (begin <= midval) { 
-                        lt = mid + 1;
-                    } else {
-                        rt = mid;
-                    }
-                } else {
-                    lt = mid;
-                    break;
-                }
-            }
-            
+        int min_idx = findMin(nums);
+        if (target <= nums.back()) {
+            return binarySearch(nums, min_idx, nums.size(), target);
+        } else {
+            return binarySearch(nums, 0, min_idx, target);
         }
-        if (lt == rt) return -1;
+    }
+    
+    int findMin(vector<int>& nums) {
+        int lt = 0, rt = nums.size() - 1;
+        while (lt < rt) {
+            int mid = lt + ( rt - lt ) / 2;
+            if (nums[mid] < nums[rt]) {
+                rt = mid;
+            } else {
+                lt = mid + 1;
+            }
+        }
         return lt;
     }
+    
+    int binarySearch(vector<int>& nums, int lt, int rt, int target) { // [lt, rt)
+        while (lt < rt) {
+            int mid = lt + (rt - lt) / 2;
+            if (nums[mid] > target) {
+                rt = mid;
+            } else if (nums[mid] < target) {
+                lt = mid + 1;
+            } else {
+                return mid;
+            }
+        }
+        
+        return -1;
+    }
 };
+
+
+
+
