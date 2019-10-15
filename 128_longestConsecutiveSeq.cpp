@@ -16,7 +16,7 @@ public:
                 ++num;
             }
 
-            max_len = max( max_len );
+            max_len = max( max_len, len );
         }
         return max_len;
     }
